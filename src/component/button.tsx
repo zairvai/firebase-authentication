@@ -6,11 +6,13 @@ type ButtonProps = MUIButtonProps
 function Button({
     color="primary",
     variant="contained",
+    href,
+    children,
     ...props
 }:ButtonProps){
     return (
-        <MUIButton color={color} href={props.href} variant={variant}>
-            {props.children}
+        <MUIButton color={color} href={href} variant={variant} {...props}>
+            {children}
         </MUIButton>
     )
 }
