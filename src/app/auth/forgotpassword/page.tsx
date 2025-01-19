@@ -1,39 +1,74 @@
+'use client'
+
 import {PrimaryButton, PrimaryTextButton} from "@/component/button";
 import { NormalTextField } from "@/component/textfield";
-import { Box, Container, CssBaseline, Divider, Grid2, Link, Stack } from "@mui/material";
-import React from "react";
+import { Grid2, Link, Stack } from "@mui/material";
+import * as yup from 'yup'
+import {yupResolver} from '@hookform/resolvers/yup'
+import { useForm,Controller, FieldErrors } from "react-hook-form";
+import React, { useCallback, useState } from "react";
+
+
+type Values = {
+    username:string
+}
 
 export default function ForgotPassword(){
 
-    return(
-        <React.Fragment>
-            <CssBaseline/>
-            <Container maxWidth="sm">
-                
-                <Grid2 container sx={{
-                    // border:'1px solid #333333',
-                    justifyContent:"center",
-                    alignItems:"center",
-                    height:"100vh"
-                    }}>
-                    <Grid2 container sx={{
-                        p:2,
-                        // border:"1px solid #f00"
-                        }} 
-                        direction={"column"} size={"grow"} spacing={2}>
+    const [isProcessing,setProcessing] = useState<boolean>(false)
+        const schema = yup.object().shape({
+            username:yup.string().required("Please enter email address").email("Please enter valid email address"),
+        })
+    
+        const {handleSubmit,control} = useForm<Values>({
+            mode:"onChange",
+            resolver:yupResolver(schema),
+            defaultValues:{
+                username:"",
+            }
+        })
+    
+        const errorHandler = useCallback((errors:FieldErrors)=>{
+            console.log(errors)
+        },[])
+    
+        const submitHandler = useCallback(async(values:Values)=>{
+            setProcessing(true)
+            console.log(values)
+        },[])
+    
 
-                        <Stack spacing={2}>
-                            <Stack>
-                                <NormalTextField label="Username/Email"/>
-                            </Stack>
-                        </Stack>
-                        <Stack direction={"row-reverse"} spacing={3}>
-                            <PrimaryButton>Verify</PrimaryButton>
-                            <PrimaryTextButton href="/auth/login">back to Sign In</PrimaryTextButton>
-                        </Stack>
-                    </Grid2>
-                </Grid2>
-            </Container>
-        </React.Fragment>
+    return(
+        <form onSubmit={handleSubmit(submitHandler,errorHandler)}>
+            <Grid2 container direction={'column'} spacing={2}>
+
+                <Stack spacing={2}>
+                    <Stack>
+                        <Controller
+                            control={control}
+                            name="username"
+                            render={
+                                ({
+                                    field:{onChange,onBlur,value},
+                                    fieldState:{invalid,error}
+                                })=>(
+                                    <NormalTextField 
+                                        label="Email address"
+                                        value={value}
+                                        onChange={onChange}
+                                        error={error?.message?true:false}
+                                        helperText={error?.message}
+                                    />
+                                )
+                            }
+                        />
+                    </Stack>
+                </Stack>
+                <Stack direction={"row-reverse"} spacing={3}>
+                    <PrimaryButton type="submit" loading={isProcessing} loadingPosition="start">Verify</PrimaryButton>
+                    <PrimaryTextButton href="/auth/login">back to Sign In</PrimaryTextButton>
+                </Stack>
+            </Grid2>
+        </form>
     )
 }

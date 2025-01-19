@@ -11,7 +11,7 @@ function Button({
     ...props
 }:ButtonProps){
     return (
-        <MUIButton color={color} href={href} variant={variant} {...props}>
+        <MUIButton type='submit' color={color} href={href} variant={variant} {...props}>
             {children}
         </MUIButton>
     )
@@ -19,40 +19,34 @@ function Button({
 
 export function PrimaryButton({
     children,
-    href
-}:{
-    children:React.ReactNode
-    href?:string
-}){
+    href,
+    ...props
+}:Omit<ButtonProps,"color"|"variant">){
 
     return(
-        <Button href={href} color="primary" variant='contained'>{children}</Button>
+        <Button href={href} color="primary" variant='contained' {...props} >{children}</Button>
     )
 }
 
 export function PrimaryOutlinedButton({
     children,
-    href
-}:{
-    children:React.ReactNode
-    href?:string
-}){
+    href,
+    ...props
+}:Omit<ButtonProps,"color"|"variant">){
 
     return(
-        <Button href={href} color="primary" variant="outlined">{children}</Button>
+        <Button href={href} color="primary" variant="outlined" {...props}>{children}</Button>
     )
 }
 
 export function PrimaryTextButton({
     children,
-    href
-}:{
-    children:React.ReactNode
-    href?:string
-}){
+    href,
+    ...props
+}:Omit<ButtonProps,"color"|"variant">){
 
     return(
-        <Button href={href} color="primary" variant="text">{children}</Button>
+        <Button href={href} color="primary" variant="text" {...props} >{children}</Button>
     )
 }
 
