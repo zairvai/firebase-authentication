@@ -1,4 +1,4 @@
-#integrating NextJS App Router with Firebase Authentication
+# integrating NextJS App Router with Firebase Authentication
 
 ... still on going, updates are coming
 
