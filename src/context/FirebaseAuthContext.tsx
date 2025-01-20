@@ -80,7 +80,7 @@ export function FirebaseAuthProvider({
         })
 
         return ()=>unsubscribe()
-    },[])
+    },[isLoggedIn])
 
     useEffect(()=>{
         console.log(user)
