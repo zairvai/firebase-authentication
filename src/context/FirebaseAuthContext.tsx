@@ -1,10 +1,10 @@
 'use client'
 
 import { User } from "firebase/auth";
-import { SignInWithEmailProps, SignUpWithEmailProps } from "@/lib/auth/type";
+import { SignUpWithEmailProps } from "@/lib/auth/type";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { _createUserWithEmailAndPassword, _onAuthStateChanged, _sendPasswordResetEmail, _signInWithEmailAndPassword, _signOut, _verifyEmail } from "@/lib/firebase/auth";
-import { redirect, usePathname,useRouter } from "next/navigation";
+import { usePathname,useRouter } from "next/navigation";
 import { authPathnames } from "@/global.config";
 
 
