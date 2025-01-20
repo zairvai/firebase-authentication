@@ -1,7 +1,16 @@
 # integrating NextJS App Router with Firebase Authentication
 
-... still on going, updates are coming
+## create project
 
-Any Feedback please let me know
+$: npx create-next-app@latest 
 
-Thanks
+what is your project named: firebase-authentication
+
+✔ What is your project named? … firebase-authentication
+✔ Would you like to use TypeScript? … No / Yes => Yes
+✔ Would you like to use ESLint? … No / Yes => No
+✔ Would you like to use Tailwind CSS? … No / Yes  => No
+✔ Would you like your code inside a `src/` directory? … No / Yes  => Yes
+✔ Would you like to use App Router? (recommended) … No / Yes => Yes
+✔ Would you like to use Turbopack for `next dev`? … No / Yes => Yes
+✔ Would you like to customize the import alias (`@/*` by default)? … No / Yes => No
