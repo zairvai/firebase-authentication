@@ -7,7 +7,7 @@ import * as yup from 'yup'
 import {yupResolver} from '@hookform/resolvers/yup'
 import { useForm,Controller, FieldErrors } from "react-hook-form";
 import React, { useCallback, useState } from "react";
-import { firebaseSignInWithEmail } from "@/firebase/auth";
+import { useFirebaseAuth } from "@/context/FirebaseAuthContext";
 
 type Values = {
     username:string
@@ -16,7 +16,10 @@ type Values = {
 
 export default function Login(){
 
+    const auth = useFirebaseAuth()
+
     const [isProcessing,setProcessing] = useState<boolean>(false)
+
     const schema = yup.object().shape({
         username:yup.string().required("Please enter email address").email("Please enter valid email address"),
         password:yup.string().required("Please type in your password")
@@ -39,7 +42,7 @@ export default function Login(){
         setProcessing(true)
         console.log(values)
 
-        await firebaseSignInWithEmail(values.username,values.password)
+        await auth.signIn(values.username,values.password)
 
         setProcessing(false)
 

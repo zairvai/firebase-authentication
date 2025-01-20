@@ -7,7 +7,7 @@ import * as yup from 'yup'
 import {yupResolver} from '@hookform/resolvers/yup'
 import { useForm,Controller, FieldErrors } from "react-hook-form";
 import React, { useCallback, useState } from "react";
-import { firebaseRegister } from "@/firebase/auth";
+import { firebaseRegister } from "@/lib/firebase/auth";
 
 type Values = {
     fullname:string
