@@ -1,6 +1,6 @@
 # integrating NextJS App Router with Firebase Authentication
 
-## create project
+## 1. create project
 
 $: npx create-next-app@latest 
 
@@ -14,3 +14,8 @@ what is your project named: firebase-authentication
 - ✔ Would you like to use App Router? (recommended) … No / Yes => Yes
 - ✔ Would you like to use Turbopack for `next dev`? … No / Yes => Yes
 - ✔ Would you like to customize the import alias (`@/*` by default)? … No / Yes => No
+
+
+## 2. Login to console and activate authentication [https://console.firebase.google.com]
+
+### - activate sign-up method "Email/Password"
