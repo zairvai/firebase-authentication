@@ -7,6 +7,28 @@ const nextConfig: NextConfig = {
     buildActivity: true, // defaults to true
     buildActivityPosition: 'bottom-right'
   },
+  async rewrites(){
+    return[
+        {
+            source:"/__/auth/:path*",
+            destination:"https://tutorial-921ca.firebaseapp.com/__/auth/:path*",
+        }
+    ]
+  },
+  async redirects(){
+    return [
+        {
+            source:"/",
+            destination:"/auth/login",
+            permanent:true
+        },
+        {
+            source:"/auth",
+            destination:"/auth/login",
+            permanent:true
+        }
+    ]
+  }
 };
 
 export default nextConfig;

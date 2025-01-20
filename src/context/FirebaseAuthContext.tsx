@@ -2,8 +2,9 @@
 
 import { User } from "firebase/auth";
 import { SignInWithEmailProps, SignUpWithEmailProps } from "@/lib/auth/type";
-import { createContext, ReactNode, useCallback, useContext, useState } from "react";
-import { _createUserWithEmailAndPassword, _signInWithEmailAndPassword, _signOut, _verifyEmail } from "@/lib/firebase/auth";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { _createUserWithEmailAndPassword, _onAuthStateChanged, _sendPasswordResetEmail, _signInWithEmailAndPassword, _signOut, _verifyEmail } from "@/lib/firebase/auth";
+import { redirect } from "next/navigation";
 
 type ContextProps = {
     user:User|null;
@@ -14,6 +15,7 @@ type ContextProps = {
     // signInWithGoogle:()=>Promise<void>|null;
     signOut:()=>Promise<void>|null;
     verifyEmail:(code:string)=>Promise<boolean|undefined>|null;
+    sendPasswordResetEmail:(email:string)=>Promise<boolean|undefined>|null;
 }
 
 
@@ -25,7 +27,8 @@ const FirebaseAuthContext = createContext<ContextProps>({
     register:(props:SignUpWithEmailProps)=>null,
     // signInWithGoogle:()=>null,
     signOut:()=>null,
-    verifyEmail:(code:string)=>null
+    verifyEmail:(code:string)=>null,
+    sendPasswordResetEmail:(email:string)=>null
 })
 
 export const useFirebaseAuth = () =>{
@@ -33,8 +36,10 @@ export const useFirebaseAuth = () =>{
 }
 
 export function FirebaseAuthProvider({
+    fallbackUrl,
     children
 }:{
+    fallbackUrl?:string
     children:ReactNode
 }){
 
@@ -42,13 +47,40 @@ export function FirebaseAuthProvider({
     const [isAuthorizing,setAuthorizing] = useState<boolean>(false)
     const [isLoggedIn,setLoggedIn] = useState<boolean>(false)
 
+
+    useEffect(()=>{
+        setAuthorizing(true)
+
+        const unsubscribe = _onAuthStateChanged(async (authUser)=>{
+            console.log(authUser)
+            if(authUser){
+                setUser(authUser)
+                setLoggedIn(true)
+                redirect("/dashboard")
+            }
+            else{
+                setUser(null)
+                setLoggedIn(false)
+                if(fallbackUrl) redirect("/auth")
+            }
+
+            setAuthorizing(false)
+        })
+
+        return ()=>unsubscribe()
+    },[])
+
+    useEffect(()=>{
+        console.log(user)
+    },[user])
+
     const signIn = useCallback(async (username:string,password:string)=>{
 
         try{
 
             setAuthorizing(true)
-            const credential = await _signInWithEmailAndPassword(username,password)
-            console.log(credential?.user)
+            await _signInWithEmailAndPassword(username,password)
+            
         }catch(error){
             throw error
         }finally{
@@ -61,12 +93,7 @@ export function FirebaseAuthProvider({
 
         try{
 
-            const credential = await _createUserWithEmailAndPassword(props.username,props.password)
-            
-            await Promise.all([
-                //updateProfile(credential.user,{displayName:name}),//should update via firestore function
-                //sendEmailVerification(credential.user)
-            ])
+            await _createUserWithEmailAndPassword(props.username,props.password)
 
         }catch(error){
             throw error
@@ -80,27 +107,14 @@ export function FirebaseAuthProvider({
 
             setAuthorizing(true)
             await _signOut()
-            setUser(null)
+            
+            // setUser(null)
+            // setLoggedIn(false)
 
         }catch(error){
             throw error
         }
     },[])
-
-    const verifyEmail = async (code:string) =>{
-
-        try{
-            
-            await _verifyEmail(code)
-
-            return true
-
-        }catch(error){
-            throw error
-        }
-    }
-
-
 
     return(
         <FirebaseAuthContext.Provider value ={{
@@ -109,7 +123,8 @@ export function FirebaseAuthProvider({
             register,
             // signInWithGoogle,
             signOut,
-            verifyEmail,
+            verifyEmail:_verifyEmail,
+            sendPasswordResetEmail:_sendPasswordResetEmail,
             isLoggedIn,isAuthorizing}}>{children}
         </FirebaseAuthContext.Provider>
     )

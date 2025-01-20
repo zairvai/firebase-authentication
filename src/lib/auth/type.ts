@@ -4,7 +4,7 @@ export type SignInWithEmailProps = {
 }
 
 export type SignUpWithEmailProps = {
-    name:string;
+    fullname:string;
     username:string;
     password:string;
 }

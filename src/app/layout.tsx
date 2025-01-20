@@ -23,7 +23,7 @@ export default function RootLayout({
             <body className={roboto.variable}>
                 <AppRouterCacheProvider>
                     <ThemeProvider theme={theme}>
-                        <FirebaseAuthProvider>
+                        <FirebaseAuthProvider fallbackUrl="/auth/login">
                             {children}
                         </FirebaseAuthProvider>
                     </ThemeProvider>
