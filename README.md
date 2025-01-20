@@ -17,5 +17,9 @@ what is your project named: firebase-authentication
 
 
 ## 2. Login to console and activate authentication [https://console.firebase.google.com]
+- Before you start you have to create new project.
+- After the project is created, copy the configuration generated upon creating and save it to .env local files 
+    -- [https://github.com/zairvai/firebase-authentication/blob/main/src/lib/firebase/config.ts]
+
 
 ### - activate sign-up method "Email/Password"
