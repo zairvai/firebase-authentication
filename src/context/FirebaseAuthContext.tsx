@@ -4,8 +4,9 @@ import { User } from "firebase/auth";
 import { SignInWithEmailProps, SignUpWithEmailProps } from "@/lib/auth/type";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { _createUserWithEmailAndPassword, _onAuthStateChanged, _sendPasswordResetEmail, _signInWithEmailAndPassword, _signOut, _verifyEmail } from "@/lib/firebase/auth";
-import { redirect, usePathname } from "next/navigation";
+import { redirect, usePathname,useRouter } from "next/navigation";
 import { authPathnames } from "@/global.config";
+
 
 type ContextProps = {
     user:User|null;
@@ -44,7 +45,9 @@ export function FirebaseAuthProvider({
     children:ReactNode
 }){
 
+    
     const pathname =usePathname()
+    const router = useRouter()
 
     const [user,setUser] = useState<User|null>(null)
     const [isAuthorizing,setAuthorizing] = useState<boolean>(false)
@@ -59,7 +62,7 @@ export function FirebaseAuthProvider({
             if(authUser){
                 setUser(authUser)
                 setLoggedIn(true)
-                redirect("/dashboard")
+                router.replace("/dashboard")
             }
             else{
                 setUser(null)
@@ -67,7 +70,7 @@ export function FirebaseAuthProvider({
                 if(fallbackUrl){
                     
                     if(!authPathnames.find(elm=>elm===pathname)){
-                        redirect("/auth")
+                        router.replace("/auth")
                     }
                     
                 }
