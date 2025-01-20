@@ -1,5 +1,7 @@
 # integrating NextJS App Router with Firebase Authentication
 
+- live demo [https://main.d26jlw48c5yifc.amplifyapp.com/auth/login]
+
 ## 1. create project
 
 $: npx create-next-app@latest 
