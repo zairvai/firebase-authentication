@@ -4,7 +4,8 @@ import { User } from "firebase/auth";
 import { SignInWithEmailProps, SignUpWithEmailProps } from "@/lib/auth/type";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { _createUserWithEmailAndPassword, _onAuthStateChanged, _sendPasswordResetEmail, _signInWithEmailAndPassword, _signOut, _verifyEmail } from "@/lib/firebase/auth";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
+import { authPathnames } from "@/global.config";
 
 type ContextProps = {
     user:User|null;
@@ -43,6 +44,8 @@ export function FirebaseAuthProvider({
     children:ReactNode
 }){
 
+    const pathname =usePathname()
+
     const [user,setUser] = useState<User|null>(null)
     const [isAuthorizing,setAuthorizing] = useState<boolean>(false)
     const [isLoggedIn,setLoggedIn] = useState<boolean>(false)
@@ -52,7 +55,7 @@ export function FirebaseAuthProvider({
         setAuthorizing(true)
 
         const unsubscribe = _onAuthStateChanged(async (authUser)=>{
-            console.log(authUser)
+            // console.log(authUser)
             if(authUser){
                 setUser(authUser)
                 setLoggedIn(true)
@@ -61,7 +64,13 @@ export function FirebaseAuthProvider({
             else{
                 setUser(null)
                 setLoggedIn(false)
-                if(fallbackUrl) redirect("/auth")
+                if(fallbackUrl){
+                    
+                    if(!authPathnames.find(elm=>elm===pathname)){
+                        redirect("/auth")
+                    }
+                    
+                }
             }
 
             setAuthorizing(false)
