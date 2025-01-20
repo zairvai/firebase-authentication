@@ -7,6 +7,7 @@ import * as yup from 'yup'
 import {yupResolver} from '@hookform/resolvers/yup'
 import { useForm,Controller, FieldErrors } from "react-hook-form";
 import React, { useCallback, useState } from "react";
+import { firebaseSignInWithEmail } from "@/firebase/auth";
 
 type Values = {
     username:string
@@ -37,6 +38,11 @@ export default function Login(){
     const submitHandler = useCallback(async(values:Values)=>{
         setProcessing(true)
         console.log(values)
+
+        await firebaseSignInWithEmail(values.username,values.password)
+
+        setProcessing(false)
+
     },[])
 
 
