@@ -1,6 +1,6 @@
 'use client'
 
-import { applyActionCode, createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword,  signOut, User } from "firebase/auth";
+import { applyActionCode, createUserWithEmailAndPassword, GoogleAuthProvider, getRedirectResult, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail, setPersistence, signInWithEmailAndPassword,  signInWithRedirect,  signOut, User } from "firebase/auth";
 import { SignUpWithEmailProps } from "@/lib/auth/type";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { usePathname,useRouter } from "next/navigation";
@@ -15,8 +15,9 @@ type ContextProps = {
     isAuthorizing:boolean;
     signIn:(username:string,password:string)=>Promise<void>|null;
     register:(props:SignUpWithEmailProps)=>Promise<void>|null;
-    // signInWithGoogle:()=>Promise<void>|null;
+    signInWithGoogle:()=>Promise<void>|null;
     signOut:()=>Promise<void>|null;
+    getRedirectResult:()=>Promise<void>|null,
     verifyEmail:(code:string)=>Promise<boolean|undefined>|null;
     sendPasswordResetEmail:(email:string)=>Promise<boolean|undefined>|null;
 }
@@ -28,8 +29,9 @@ const FirebaseAuthContext = createContext<ContextProps>({
     isAuthorizing:false,
     signIn:(username:string,password:string)=>null,
     register:(props:SignUpWithEmailProps)=>null,
-    // signInWithGoogle:()=>null,
+    signInWithGoogle:()=>null,
     signOut:()=>null,
+    getRedirectResult:()=>null,
     verifyEmail:(code:string)=>null,
     sendPasswordResetEmail:(email:string)=>null
 })
@@ -54,7 +56,6 @@ export function FirebaseAuthProvider({
     const [isAuthorizing,setAuthorizing] = useState<boolean>(false)
     const [isLoggedIn,setLoggedIn] = useState<boolean>(false)
 
-
     useEffect(()=>{
         setAuthorizing(true)
 
@@ -71,7 +72,8 @@ export function FirebaseAuthProvider({
                 if(fallbackUrl){
                     
                     if(!authPathnames.find(elm=>elm===pathname)){
-                        router.replace("/auth")
+                        console.log("redirect auth")
+                        router.replace(fallbackUrl)
                     }
                     
                 }
@@ -81,7 +83,7 @@ export function FirebaseAuthProvider({
         })
 
         return ()=>unsubscribe()
-    },[])
+    },[isLoggedIn])
 
     // useEffect(()=>{
     //     console.log(user)
@@ -133,7 +135,34 @@ export function FirebaseAuthProvider({
     },[])
 
     const _signInWithGoogle = useCallback(async()=>{
+        try{
+            setAuthorizing(true)
 
+            //await setPersistence(auth, inMemoryPersistence)
+            const provider = new GoogleAuthProvider()
+            // provider.addScope("https://www.googleapis.com/auth/contacts.readonly")
+            provider.addScope("profile")
+            provider.addScope("email")
+
+            signInWithRedirect(auth,provider)
+
+        }catch(error:any){
+            throw error
+        }
+
+    },[])
+
+    const _getRedirectResult = useCallback(async ()=>{
+        try{
+            setAuthorizing(true)
+
+            const credential = await getRedirectResult(auth)
+            
+        }catch(error){
+            console.log(error)
+        }finally{
+            setAuthorizing(false)
+        }
 
     },[])
 
@@ -193,8 +222,9 @@ export function FirebaseAuthProvider({
             user,
             signIn:_signIn,
             register:_register,
-            // signInWithGoogle,
+            signInWithGoogle:_signInWithGoogle,
             signOut:_signOut,
+            getRedirectResult:_getRedirectResult,
             verifyEmail:_verifyEmail,
             sendPasswordResetEmail:_sendPasswordResetEmail,
             isLoggedIn,isAuthorizing}}>{children}

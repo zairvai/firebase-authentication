@@ -8,14 +8,14 @@ $: npx create-next-app@latest
 
 what is your project named: firebase-authentication
 
-- ✔ What is your project named? … firebase-authentication
-- ✔ Would you like to use TypeScript? … No / Yes => Yes
-- ✔ Would you like to use ESLint? … No / Yes => No
-- ✔ Would you like to use Tailwind CSS? … No / Yes  => No
-- ✔ Would you like your code inside a `src/` directory? … No / Yes  => Yes
-- ✔ Would you like to use App Router? (recommended) … No / Yes => Yes
-- ✔ Would you like to use Turbopack for `next dev`? … No / Yes => Yes
-- ✔ Would you like to customize the import alias (`@/*` by default)? … No / Yes => No
+>. ✔ What is your project named? … firebase-authentication
+>. ✔ Would you like to use TypeScript? … No / Yes => Yes
+>. ✔ Would you like to use ESLint? … No / Yes => No
+>. ✔ Would you like to use Tailwind CSS? … No / Yes  => No
+>. ✔ Would you like your code inside a `src/` directory? … No / Yes  => Yes
+>. ✔ Would you like to use App Router? (recommended) … No / Yes => Yes
+>. ✔ Would you like to use Turbopack for `next dev`? … No / Yes => Yes
+>. ✔ Would you like to customize the import alias (`@/*` by default)? … No / Yes => No
 
 ## 2. install firebase
     npm install firebase or yarn add firebase
@@ -32,7 +32,7 @@ what is your project named: firebase-authentication
 
 ### Code
 
-    - Sign Up with Email
+    - Sign up with Email
 
     const _register = useCallback(async(props:SignUpWithEmailProps)=>{
 
@@ -59,7 +59,7 @@ what is your project named: firebase-authentication
 
     },[])
 
-    - Sign In with Email
+    - Sign in with Email
 
     const _signIn = useCallback(async (username:string,password:string)=>{
 
@@ -123,4 +123,58 @@ what is your project named: firebase-authentication
         })
 
         return ()=>unsubscribe()
+    },[])
+
+
+### - activate sign-up method "Google" in firebase console
+
+- first activate 'google' sign in method in firebase console
+- go to your google cloud console credentials [https://console.cloud.google.com/apis/credentials]
+- under OAuth 2.0 Client IDs click web client created by google service
+- under authorized redirect uri add your url eg; https://localhost:3000/__/auth/handler
+!(images/google_redirect.png)
+
+### Code
+
+- Sign in with google 
+
+    const _signInWithGoogle = useCallback(async()=>{
+        try{
+            setAuthorizing(true)
+
+            //await setPersistence(auth, inMemoryPersistence)
+            const provider = new GoogleAuthProvider()
+            // provider.addScope("https://www.googleapis.com/auth/contacts.readonly")
+            provider.addScope("profile")
+            provider.addScope("email")
+
+            signInWithRedirect(auth,provider)
+
+        }catch(error:any){
+            throw error
+        }
+
+    },[])
+
+- getRedirect (this will handle response from google)
+
+    const _getRedirectResult = useCallback(async ()=>{
+        try{
+            setAuthorizing(true)
+
+            const credential = await getRedirectResult(auth)
+            
+        }catch(error){
+            console.log(error)
+        }finally{
+            setAuthorizing(false)
+        }
+
+    },[])
+
+-- add listener in login page 
+
+    useEffect(()=>{
+        //get redirect result when sign in using third party like google, fb
+        auth.getRedirectResult()
     },[])

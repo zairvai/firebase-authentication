@@ -20,11 +20,12 @@ function Button({
 export function PrimaryButton({
     children,
     href,
+    color="primary",
     ...props
-}:Omit<ButtonProps,"color"|"variant">){
+}:Omit<ButtonProps,"variant">){
 
     return(
-        <Button href={href} color="primary" variant='contained' {...props} >{children}</Button>
+        <Button href={href} color={color} variant='contained' {...props} >{children}</Button>
     )
 }
 
@@ -50,4 +51,15 @@ export function PrimaryTextButton({
     )
 }
 
-export default Button
+
+export function RedButton({
+    children,
+    href,
+    ...props
+}:Omit<ButtonProps,"variant">){
+
+    return(
+        <Button href={href} sx={{background:"#fc034e"}} variant='contained' {...props} >{children}</Button>
+    )
+}
+
