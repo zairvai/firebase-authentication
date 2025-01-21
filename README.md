@@ -32,8 +32,8 @@ what is your project named: firebase-authentication
 
 ### Code
 
-    - Sign up with Email
-
+- Sign up with Email
+```
     const _register = useCallback(async(props:SignUpWithEmailProps)=>{
 
         try{
@@ -58,8 +58,9 @@ what is your project named: firebase-authentication
         }
 
     },[])
-
-    - Sign in with Email
+```
+```
+- Sign in with Email
 
     const _signIn = useCallback(async (username:string,password:string)=>{
 
@@ -81,8 +82,8 @@ what is your project named: firebase-authentication
 
     },[])
 
-
-    - Sign out
+```
+- Sign out
 
     const _signOut = useCallback(async()=>{
         
@@ -95,8 +96,8 @@ what is your project named: firebase-authentication
         }
     },[])
 
-    - Listen to authentication status
-
+- Listen to authentication status
+```
     useEffect(()=>{
         setAuthorizing(true)
 
@@ -124,7 +125,7 @@ what is your project named: firebase-authentication
 
         return ()=>unsubscribe()
     },[])
-
+```
 
 ### - activate sign-up method "Google" in firebase console
 
@@ -133,12 +134,14 @@ what is your project named: firebase-authentication
 - under OAuth 2.0 Client IDs click web client created by google service
 - under authorized redirect uri add your url eg; https://localhost:3000/__/auth/handler
 ![](https://github.com/zairvai/firebase-authentication/blob/main/images/google_redirect.png)
+
+
 ### Code
 
 - update next.config.ts
 
     change the <firebase_domain_url> to your firebase auth domain url 
-
+```
     async rewrites(){
         return[
             {
@@ -147,7 +150,7 @@ what is your project named: firebase-authentication
             }
         ]
     },
-
+```
 - update .env
 
     because you might want to run locally
@@ -158,7 +161,7 @@ what is your project named: firebase-authentication
 
 
 - Sign in with google 
-
+```
     const _signInWithGoogle = useCallback(async()=>{
         try{
             setAuthorizing(true)
@@ -176,9 +179,10 @@ what is your project named: firebase-authentication
         }
 
     },[])
-
+```
 - getRedirect (this will handle response from google)
 
+```
     const _getRedirectResult = useCallback(async ()=>{
         try{
             setAuthorizing(true)
@@ -192,10 +196,11 @@ what is your project named: firebase-authentication
         }
 
     },[])
-
--- add listener in login page 
-
+```
+- add listener in login page 
+```
     useEffect(()=>{
         //get redirect result when sign in using third party like google, fb
         auth.getRedirectResult()
     },[])
+```
