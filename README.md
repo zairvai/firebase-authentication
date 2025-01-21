@@ -34,31 +34,49 @@ what is your project named: firebase-authentication
 
     - Sign Up with Email
 
-    const register = useCallback(async(props:SignUpWithEmailProps)=>{
+    const _register = useCallback(async(props:SignUpWithEmailProps)=>{
 
         try{
+            const {username,password} = props
 
-            await _createUserWithEmailAndPassword(props.username,props.password)
-
-        }catch(error){
-            throw error
+            const credential = await createUserWithEmailAndPassword(auth,username,password)
+    
+            await Promise.all([
+                // updateProfile(credential.user,{displayName:name}),//should update via firestore function
+                sendEmailVerification(credential.user)
+            ])
+            
+        }catch(error:any){
+            if(error.code == "auth/email-already-in-use") throw new FormError("username","Email address already in use.")
+            else if(error.code == "auth/invalid-email") throw new FormError("username","Please type email address correctly.")
+            else if(error.code == "auth/weak-password") throw new FormError("password","New password is not strong enough.")
+            else if(error.code == "auth/password-does-not-meet-requirements") throw new FormError("password","Password must contain an upper case character, lower case character, non-alphanumeric")
+            else {
+                console.error(error)
+                throw new AuthError("General Errors, please contact Administrator")
+            }
         }
 
     },[])
 
     - Sign In with Email
 
-    const signIn = useCallback(async (username:string,password:string)=>{
+    const _signIn = useCallback(async (username:string,password:string)=>{
 
         try{
-
-            setAuthorizing(true)
-            await _signInWithEmailAndPassword(username,password)
+            // await setPersistence(auth, inMemoryPersistence)
             
-        }catch(error){
-            throw error
-        }finally{
-            setAuthorizing(false)
+            await signInWithEmailAndPassword(auth,username,password);
+                        
+        }catch(error:any){
+            if(error.code == "auth/invalid-email" || error.code == "auth/wrong-password" || error.code == "auth/user-not-found" || error.code == "auth/invalid-credential") throw new AuthError("Either email address or password are incorrect.")
+            else if(error.code == "auth/too-many-requests") throw new AuthError("Too many failed login attempts. Access currently disabled or you may activate it by resetting your password or you may try again later.")
+            else if(error.code == "auth/user-disabled") throw new AuthError("Sorry your account has been disabled.")
+            else {
+                
+                console.error(error)
+                throw new AuthError("General Errors, please contact Administrator")
+            }
         }
 
     },[])
@@ -66,14 +84,43 @@ what is your project named: firebase-authentication
 
     - Sign out
 
-    const signOut = useCallback(async()=>{
+    const _signOut = useCallback(async()=>{
         
         try{
 
-            setAuthorizing(true)
-            await _signOut()
+            await signOut(auth)
 
         }catch(error){
             throw error
         }
+    },[])
+
+    - Listen to authentication status
+
+    useEffect(()=>{
+        setAuthorizing(true)
+
+        const unsubscribe = onAuthStateChanged(auth,async (authUser)=>{
+            // console.log(authUser)
+            if(authUser){
+                setUser(authUser)
+                setLoggedIn(true)
+                router.replace("/dashboard")
+            }
+            else{
+                setUser(null)
+                setLoggedIn(false)
+                if(fallbackUrl){
+                    
+                    if(!authPathnames.find(elm=>elm===pathname)){
+                        router.replace("/auth")
+                    }
+                    
+                }
+            }
+
+            setAuthorizing(false)
+        })
+
+        return ()=>unsubscribe()
     },[])
