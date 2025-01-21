@@ -8,14 +8,14 @@ $: npx create-next-app@latest
 
 what is your project named: firebase-authentication
 
->. ✔ What is your project named? … firebase-authentication
->. ✔ Would you like to use TypeScript? … No / Yes => Yes
->. ✔ Would you like to use ESLint? … No / Yes => No
->. ✔ Would you like to use Tailwind CSS? … No / Yes  => No
->. ✔ Would you like your code inside a `src/` directory? … No / Yes  => Yes
->. ✔ Would you like to use App Router? (recommended) … No / Yes => Yes
->. ✔ Would you like to use Turbopack for `next dev`? … No / Yes => Yes
->. ✔ Would you like to customize the import alias (`@/*` by default)? … No / Yes => No
+- ✔ What is your project named? … firebase-authentication
+- ✔ Would you like to use TypeScript? … No / Yes => Yes
+- ✔ Would you like to use ESLint? … No / Yes => No
+- ✔ Would you like to use Tailwind CSS? … No / Yes  => No
+- ✔ Would you like your code inside a `src/` directory? … No / Yes  => Yes
+- ✔ Would you like to use App Router? (recommended) … No / Yes => Yes
+- ✔ Would you like to use Turbopack for `next dev`? … No / Yes => Yes
+- ✔ Would you like to customize the import alias (`@/*` by default)? … No / Yes => No
 
 ## 2. install firebase
     npm install firebase or yarn add firebase
@@ -135,6 +135,28 @@ what is your project named: firebase-authentication
 !(images/google_redirect.png)
 
 ### Code
+
+- update next.config.ts
+
+    change the <firebase_domain_url> to your firebase auth domain url 
+
+    async rewrites(){
+        return[
+            {
+                source:"/__/auth/:path*",
+                destination:"<firebase_domain_url>/__/auth/:path*",
+            }
+        ]
+    },
+
+- update .env
+
+    because you might want to run locally
+
+    change the NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="<firebase_domain_url>"
+    to NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="localhost:3000"
+    or NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="<your-public-domain>"
+
 
 - Sign in with google 
 
