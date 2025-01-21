@@ -1,11 +1,12 @@
 'use client'
 
-import { User } from "firebase/auth";
+import { applyActionCode, createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword,  signOut, User } from "firebase/auth";
 import { SignUpWithEmailProps } from "@/lib/auth/type";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
-import { _createUserWithEmailAndPassword, _onAuthStateChanged, _sendPasswordResetEmail, _signInWithEmailAndPassword, _signOut, _verifyEmail } from "@/lib/firebase/auth";
 import { usePathname,useRouter } from "next/navigation";
 import { authPathnames } from "@/global.config";
+import { auth } from "@/lib/firebase/clientApp";
+import { AuthError, FormError } from "@/lib/util/AppError";
 
 
 type ContextProps = {
@@ -57,7 +58,7 @@ export function FirebaseAuthProvider({
     useEffect(()=>{
         setAuthorizing(true)
 
-        const unsubscribe = _onAuthStateChanged(async (authUser)=>{
+        const unsubscribe = onAuthStateChanged(auth,async (authUser)=>{
             // console.log(authUser)
             if(authUser){
                 setUser(authUser)
@@ -86,55 +87,114 @@ export function FirebaseAuthProvider({
         console.log(user)
     },[user])
 
-    const signIn = useCallback(async (username:string,password:string)=>{
+    const _register = useCallback(async(props:SignUpWithEmailProps)=>{
 
         try{
+            const {username,password} = props
 
-            setAuthorizing(true)
-            await _signInWithEmailAndPassword(username,password)
+            const credential = await createUserWithEmailAndPassword(auth,username,password)
+    
+            await Promise.all([
+                // updateProfile(credential.user,{displayName:name}),//should update via firestore function
+                sendEmailVerification(credential.user)
+            ])
             
-        }catch(error){
-            throw error
-        }finally{
-            setAuthorizing(false)
+        }catch(error:any){
+            if(error.code == "auth/email-already-in-use") throw new FormError("username","Email address already in use.")
+            else if(error.code == "auth/invalid-email") throw new FormError("username","Please type email address correctly.")
+            else if(error.code == "auth/weak-password") throw new FormError("password","New password is not strong enough.")
+            else if(error.code == "auth/password-does-not-meet-requirements") throw new FormError("password","Password must contain an upper case character, lower case character, non-alphanumeric")
+            else {
+                console.error(error)
+                throw new AuthError("General Errors, please contact Administrator")
+            }
         }
 
     },[])
 
-    const register = useCallback(async(props:SignUpWithEmailProps)=>{
+    const _signIn = useCallback(async (username:string,password:string)=>{
 
         try{
-
-            await _createUserWithEmailAndPassword(props.username,props.password)
-
-        }catch(error){
-            throw error
+            // await setPersistence(auth, inMemoryPersistence)
+            
+            await signInWithEmailAndPassword(auth,username,password);
+                        
+        }catch(error:any){
+            if(error.code == "auth/invalid-email" || error.code == "auth/wrong-password" || error.code == "auth/user-not-found" || error.code == "auth/invalid-credential") throw new AuthError("Either email address or password are incorrect.")
+            else if(error.code == "auth/too-many-requests") throw new AuthError("Too many failed login attempts. Access currently disabled or you may activate it by resetting your password or you may try again later.")
+            else if(error.code == "auth/user-disabled") throw new AuthError("Sorry your account has been disabled.")
+            else {
+                
+                console.error(error)
+                throw new AuthError("General Errors, please contact Administrator")
+            }
         }
 
     },[])
 
-    const signOut = useCallback(async()=>{
+    const _signInWithGoogle = useCallback(async()=>{
+
+
+    },[])
+
+    const _signOut = useCallback(async()=>{
         
         try{
 
-            setAuthorizing(true)
-            await _signOut()
-            
-            // setUser(null)
-            // setLoggedIn(false)
+            // setAuthorizing(true)
+            await signOut(auth)
+            setUser(null)
+            setLoggedIn(false)
 
         }catch(error){
             throw error
         }
     },[])
+
+    const _verifyEmail = useCallback(async (code:string) =>{
+
+        try{
+            
+            await applyActionCode(auth,code)
+    
+            return true
+    
+        }catch(error:any){
+    
+            if(error.code == "auth/expired-action-code") throw new AuthError("Verification link is expired.")
+            else if(error.code == "auth/invalid-action-code") throw new AuthError("Verification link is no longer valid.")
+            else if(error.code == "auth/user-disabled") throw new AuthError("Sorry your account has been disabled.")
+            else if(error.code == "auth/user-not-found") throw new AuthError("No such account associated with the verification link.")
+            else {
+            
+                console.error(error)
+                throw new AuthError("General Errors, please contact Administrator")
+            }
+        }
+    },[])
+
+    const _sendPasswordResetEmail = useCallback(async (email:string) =>{
+
+        try{
+    
+            await sendPasswordResetEmail(auth,email)
+            return true
+    
+        }catch(error){
+            console.log(error)
+            throw error
+        }
+
+    },[])
+    
 
     return(
         <FirebaseAuthContext.Provider value ={{
             user,
-            signIn,
-            register,
+            signIn:_signIn,
+            register:_register,
             // signInWithGoogle,
-            signOut,
+            signOut:_signOut,
             verifyEmail:_verifyEmail,
             sendPasswordResetEmail:_sendPasswordResetEmail,
             isLoggedIn,isAuthorizing}}>{children}

@@ -43,4 +43,5 @@ next-env.d.ts
 
 steps.txt
 _app
+_backup
 certificates
