@@ -135,7 +135,7 @@ what is your project named: firebase-authentication
 - under authorized redirect uri add your url eg; https://localhost:3000/__/auth/handler
 
 
-![](https://github.com/zairvai/firebase-authentication/blob/main/images/google_redirect.png)
+![](https://github.com/zairvai/firebase-authentication/blob/main/images/google_redirectv1.png)
 
 
 ### Code
