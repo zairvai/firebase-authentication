@@ -133,6 +133,8 @@ what is your project named: firebase-authentication
 - go to your google cloud console credentials [https://console.cloud.google.com/apis/credentials]
 - under OAuth 2.0 Client IDs click web client created by google service
 - under authorized redirect uri add your url eg; https://localhost:3000/__/auth/handler
+
+
 ![](https://github.com/zairvai/firebase-authentication/blob/main/images/google_redirect.png)
 
 
